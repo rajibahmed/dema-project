@@ -1,0 +1,35 @@
+services:
+  backend:
+    image: dema-graph
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DB_URL=postgresql://postgres:postgres@database:5432/postgres
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: always
+
+  database:
+    image: postgres
+    hostname: database
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    volumes:
+      - db-data:/var/lib/postgres
+
+volumes:
+  db-data:
