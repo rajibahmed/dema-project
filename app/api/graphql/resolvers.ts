@@ -1,15 +1,14 @@
-const resolvers = {
+import { Product, Resolvers } from './types';
+
+const resolvers: Resolvers = {
   Query: {
-    users: () => {
-      return [
-        {
-          id: 1,
-          name: "Rajib",
-        },
-      ];
+    products: async (_: any, { cursor }: any, { db: { inventory, order } }) => {
+      return await inventory.findAll({ include: order });
     },
   },
-  Mutation: {},
+  Product: {
+    orders: (product: Product) => product?.Orders || [],
+  },
 };
 
 export default resolvers;

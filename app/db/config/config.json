@@ -1,0 +1,14 @@
+{
+  "development": {
+    "url": "postgres://postgres:postgres@127.0.0.1:5432/postgres",
+    "dialect": "postgresql"
+  },
+  "test": {
+    "url": "postgres://postgres:postgres@127.0.0.1:5432/postgres_test",
+    "dialect": "postgresql"
+  },
+  "production": {
+    "url": "postgres://postgres:postgres@127.0.0.1:5432/postgres_production",
+    "dialect": "postgresql"
+  }
+}

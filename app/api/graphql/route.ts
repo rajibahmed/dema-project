@@ -1,40 +1,42 @@
-import { startServerAndCreateNextHandler } from "@as-integrations/next";
-import { ApolloServer } from "@apollo/server";
-import { NextRequest } from "next/server";
-import schema from "./schema";
-import resolvers from "./resolvers";
-import { Sequelize } from "sequelize";
+import { startServerAndCreateNextHandler } from '@as-integrations/next';
+import { ApolloServer } from '@apollo/server';
+import { NextRequest } from 'next/server';
+import schema from './schema';
+import resolvers from './resolvers';
+import inventory from '../../db/models/inventory';
+import order from '../../db/models/order';
+import { sequelize, checkDBConnection } from './db';
+import { DataTypes } from 'sequelize';
 
-const uri = process.env.DB_URL;
+checkDBConnection();
 
-const connectDB = async () => {
-  try {
-    if (uri) {
-      console.log(`DB URL ${uri}`);
-      const sequelize = new Sequelize(uri, { dialect: "postgres" });
-      await sequelize.authenticate();
-      console.log("Connection has been established successfully.");
+const Order = order(sequelize, DataTypes);
+const Inventory = inventory(sequelize, DataTypes);
+Inventory.hasMany(Order, { foreignKey: 'productId' });
 
-      return sequelize;
-    }
-  } catch (error) {
-    console.error(error);
-  }
+type AppContext = {
+  db: {
+    inventory: typeof Inventory;
+    order: typeof Order;
+  };
 };
 
-connectDB();
-
-const server = new ApolloServer({
+const server = new ApolloServer<AppContext>({
   resolvers,
   typeDefs: schema,
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async (req, res) => ({
-    req,
-    res,
-    dataSources: {},
-  }),
+  context: async (req, res) => {
+    return {
+      req,
+      res,
+      db: {
+        inventory: Inventory,
+        order: Order,
+      },
+    };
+  },
 });
 
 export async function GET(request: NextRequest) {

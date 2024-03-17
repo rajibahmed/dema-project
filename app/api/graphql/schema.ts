@@ -1,34 +1,44 @@
 const typeDefs = `#graphql
-  type User {
-    id: ID!
+  scalar Cursor
+
+  type PageInfo {
+    hasNextPage: Boolean!
+  }
+
+  type ProductEdge {
+    cursor: Cursor!
+    node: Product!
+  }
+
+  type ProductsConnection {
+    edges: [ProductEdge!]!
+    pageInfo: PageInfo!
+  }
+
+  type Product{
+    productId: ID!
     name: String!
+    quantity: Int!
+    category: String!
+    subCategory: String!
+    orders: [Order]
   }
 
-  input NewUserInput {
-    first_name: String!
-    last_name: String!
-    email: String!
-    age: Int!
-  }
-
-  input UpdateUserInput {
-    id: ID!
-    first_name: String
-    last_name: String
-    email: String
-    age: Int
-    active: Boolean
+  type Order {
+    orderId: ID!
+    productId: String!
+    currency: String!
+    quantity: Int!
+    shippingCost: String!
+    amount: Float!
+    channel: String!
+    campaign: String!
   }
 
   type Query {
-    users: [User]
+    products: [Product]
   }
 
-  type Mutation {
-    createUser(input: NewUserInput!): User
-    updateUser(input: UpdateUserInput!): User
-    deleteUser(id: ID!): String
-  }
 `;
 
 export default typeDefs;
