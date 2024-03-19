@@ -43,15 +43,18 @@ const resolvers: Resolvers = {
 
       const offset = args.after ? Number(fromGlobalId(args.after).id) : 0;
 
-      const data = await inventory.findAll({
-        order: [['productId', 'ASC']],
-        offset,
-        limit: args.first || 10,
-        include: { model: order, as: 'orders' },
-      });
+      const data = await inventory
+        .findAll({
+          order: [['productId', 'ASC']],
+          offset,
+          limit: args.first || 10,
+          include: { model: order, as: 'orders' },
+        })
+        .catch(null);
 
       if (!data) return null;
 
+      console.log(inventory);
       const totalCount = Number(await inventory.count()) || 0;
 
       const { edges, pageInfo } = connectionFromArraySlice<Product>(
