@@ -2,9 +2,9 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { ApolloServer } from '@apollo/server';
 import schema from './schema';
 import resolvers from './resolvers';
-import inventory from '../../db/models/inventory';
-import order from '../../db/models/order';
-import { sequelize, checkDBConnection } from '../../db';
+import inventory from '@/app/db/models/inventory';
+import order from '@/app/db/models/order';
+import { sequelize, checkDBConnection } from '@/app/db';
 import { DataTypes } from 'sequelize';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -13,7 +13,6 @@ checkDBConnection();
 // setup ORM relationships
 const Order = order(sequelize, DataTypes);
 const Inventory = inventory(sequelize, DataTypes);
-
 Inventory.hasMany(Order, { foreignKey: 'productId', as: 'orders' });
 
 type AppContext = {

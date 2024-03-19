@@ -1,20 +1,24 @@
 const typeDefs = `#graphql
-  scalar Cursor
 
-  type PageInfo {
-    hasNextPage: Boolean!
-  }
+type PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  # first node in edges
+  startCursor: String
+  # last node in edges
+  endCursor: String
+}
+type ProductEdge {
+  cursor: String
+  node: Product
+}
 
-  type ProductEdge {
-    cursor: Cursor!
-    node: Product!
-  }
-
-  type ProductsConnection {
-    edges: [ProductEdge!]!
-    pageInfo: PageInfo!
-  }
-
+type ProductConnection {
+  edges: [ProductEdge]
+  nodes: [Product]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
   type Product{
     productId: ID!
     name: String!
@@ -36,7 +40,12 @@ const typeDefs = `#graphql
   }
 
   type Query {
-    products: [Product]
+    products(
+      first: Int
+      after: String
+      last: Int
+      before: String
+    ): ProductConnection
   }
 
 `;
