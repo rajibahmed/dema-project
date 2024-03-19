@@ -1,24 +1,26 @@
 const typeDefs = `#graphql
 
-type PageInfo {
-  hasNextPage: Boolean
-  hasPreviousPage: Boolean
-  # first node in edges
-  startCursor: String
-  # last node in edges
-  endCursor: String
-}
-type ProductEdge {
-  cursor: String
-  node: Product
-}
+  type PageInfo {
+    hasNextPage: Boolean
+    hasPreviousPage: Boolean
+    # first node in edges
+    startCursor: String
+    # last node in edges
+    endCursor: String
+  }
 
-type ProductConnection {
-  edges: [ProductEdge]
-  nodes: [Product]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
+  type ProductEdge {
+    cursor: String
+    node: Product
+  }
+
+  type ProductConnection {
+    edges: [ProductEdge]
+    nodes: [Product]
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
   type Product{
     productId: ID!
     name: String!
@@ -30,7 +32,7 @@ type ProductConnection {
 
   type Order {
     orderId: ID!
-    productId: String!
+    productId: ID!
     currency: String!
     quantity: Int!
     shippingCost: String!
@@ -48,6 +50,16 @@ type ProductConnection {
     ): ProductConnection
   }
 
+  input UpdateInventoryInput {
+    quantity: Int!
+    name: String
+    category: String
+    subCategory: String
+  }
+
+  type Mutation {
+    updateInventory(id: ID!, input: UpdateInventoryInput!): Product!
+  }
 `;
 
 export default typeDefs;

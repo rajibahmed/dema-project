@@ -1,5 +1,10 @@
 import { Edge, connectionFromArraySlice, fromGlobalId } from 'graphql-relay';
-import { Product, QueryProductsArgs, Resolvers } from './types';
+import {
+  Product,
+  QueryProductsArgs,
+  Resolvers,
+  UpdateInventoryInput,
+} from './types';
 import { GraphQLError } from 'graphql';
 
 const validatePaginationArgs = (args: QueryProductsArgs): void => {
@@ -39,7 +44,7 @@ const resolvers: Resolvers = {
       const offset = args.after ? Number(fromGlobalId(args.after).id) : 0;
 
       const data = await inventory.findAll({
-        order: [['id', 'ASC']],
+        order: [['productId', 'ASC']],
         offset,
         limit: args.first || 10,
         include: { model: order, as: 'orders' },
@@ -64,6 +69,25 @@ const resolvers: Resolvers = {
         edges: [],
         totalCount,
       });
+    },
+  },
+  Mutation: {
+    updateInventory: async (
+      root: unknown,
+      { id, input },
+      { db: { inventory } }
+    ) => {
+      try {
+        const product = await inventory.findByPk(id);
+        if (Number(product.quantity) - Number(input.quantity) < 0) {
+          throw new GraphQLError('product quantity cannot be below 0');
+        }
+
+        await product.update(input);
+        return product;
+      } catch (error) {
+        throw new GraphQLError('Error saving data');
+      }
     },
   },
   Product: {
