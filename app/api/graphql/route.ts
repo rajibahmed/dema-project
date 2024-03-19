@@ -1,21 +1,25 @@
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { ApolloServer } from '@apollo/server';
-import { NextRequest } from 'next/server';
 import schema from './schema';
 import resolvers from './resolvers';
 import inventory from '../../db/models/inventory';
 import order from '../../db/models/order';
-import { sequelize, checkDBConnection } from './db';
+import { sequelize, checkDBConnection } from '../../db';
 import { DataTypes } from 'sequelize';
+import { NextRequest, NextResponse } from 'next/server';
 
 checkDBConnection();
 
+// setup ORM relationships
 const Order = order(sequelize, DataTypes);
 const Inventory = inventory(sequelize, DataTypes);
-Inventory.hasMany(Order, { foreignKey: 'productId' });
+
+Inventory.hasMany(Order, { foreignKey: 'productId', as: 'orders' });
 
 type AppContext = {
-  db: {
+  req?: NextRequest;
+  res?: NextResponse;
+  db?: {
     inventory: typeof Inventory;
     order: typeof Order;
   };
@@ -26,18 +30,21 @@ const server = new ApolloServer<AppContext>({
   typeDefs: schema,
 });
 
-const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async (req, res) => {
-    return {
-      req,
-      res,
-      db: {
-        inventory: Inventory,
-        order: Order,
-      },
-    };
-  },
-});
+const handler = startServerAndCreateNextHandler<NextRequest, AppContext>(
+  server,
+  {
+    context: async (req, res) => {
+      return {
+        req,
+        res,
+        db: {
+          inventory: Inventory,
+          order: Order,
+        },
+      };
+    },
+  }
+);
 
 export async function GET(request: NextRequest) {
   return handler(request);
