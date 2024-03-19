@@ -54,7 +54,6 @@ const resolvers: Resolvers = {
 
       if (!data) return null;
 
-      console.log(inventory);
       const totalCount = Number(await inventory.count()) || 0;
 
       const { edges, pageInfo } = connectionFromArraySlice<Product>(
