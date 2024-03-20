@@ -3,14 +3,8 @@
 First, run the development server:
 
 ```
-docker-compose up database
-```
-
-then run
-
-```bash
-npm run dev
-npm run seed
+docker-compose up --build
+docker-compose exec -it backend npm run seed
 ```
 
 Open [http://localhost:3000/api/graphql](http://localhost:3000/api/graphql) with your browser to see the result.

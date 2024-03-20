@@ -1,6 +1,6 @@
 {
   "development": {
-    "url": "postgres://postgres:postgres@127.0.0.1:5432/postgres",
+    "url": "postgres://postgres:postgres@database:5432/postgres",
     "dialect": "postgresql"
   },
   "test": {
